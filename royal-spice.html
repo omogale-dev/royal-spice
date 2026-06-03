@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Spice — An Elevated Dining Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Marcellus&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#0a0807;
+  --black-2:#100d0a;
+  --panel:#15110c;
+  --panel-2:#1c160f;
+  --gold:#c9a24b;
+  --gold-bright:#e7c878;
+  --gold-deep:#9c7a2e;
+  --cream:#f3ead8;
+  --muted:#b6a98f;
+  --line:rgba(201,162,75,.22);
+  --serif:'Cormorant Garamond',serif;
+  --display:'Marcellus',serif;
+  --sans:'Jost',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);
+  color:var(--cream);
+  font-family:var(--sans);
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:none;
+}
+img{display:block;width:100%;height:100%;object-fit:cover}
+::selection{background:var(--gold);color:var(--black)}
+
+/* grain + vignette atmosphere */
+body::before{
+  content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity:.045;mix-blend-mode:overlay;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:9997;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+
+/* custom cursor */
+.cursor,.cursor-dot{position:fixed;top:0;left:0;z-index:10000;pointer-events:none;border-radius:50%;mix-blend-mode:difference}
+.cursor{width:34px;height:34px;border:1px solid var(--gold-bright);transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s,border-color .3s}
+.cursor-dot{width:5px;height:5px;background:var(--gold-bright);transform:translate(-50%,-50%)}
+.cursor.grow{width:64px;height:64px;background:rgba(231,200,120,.12);border-color:transparent}
+@media(hover:none){.cursor,.cursor-dot{display:none}body{cursor:auto}}
+
+/* preloader */
+#loader{position:fixed;inset:0;z-index:11000;background:var(--black);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 1s ease,visibility 1s}
+#loader.done{opacity:0;visibility:hidden}
+.loader-mark{font-family:var(--display);font-size:clamp(2rem,6vw,3.4rem);letter-spacing:.5em;color:var(--gold-bright);text-indent:.5em;opacity:0;animation:fadeUp 1.2s .2s forwards}
+.loader-sub{font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--muted);margin-top:1rem;letter-spacing:.2em;opacity:0;animation:fadeUp 1.2s .6s forwards}
+.loader-bar{margin-top:2.2rem;width:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:grow 1.6s .3s forwards}
+@keyframes grow{to{width:220px}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* nav */
+header{position:fixed;top:0;left:0;width:100%;z-index:900;padding:1.6rem 3.5vw;display:flex;align-items:center;justify-content:space-between;transition:background .5s,padding .5s,border-color .5s;border-bottom:1px solid transparent}
+header.scrolled{background:rgba(10,8,7,.82);backdrop-filter:blur(14px);padding:1rem 3.5vw;border-color:var(--line)}
+.brand{font-family:var(--display);font-size:1.5rem;letter-spacing:.32em;color:var(--cream);text-indent:.32em;line-height:1}
+.brand span{display:block;font-size:.6rem;letter-spacing:.55em;color:var(--gold);text-indent:.55em;margin-top:.35rem;text-align:center}
+nav{display:flex;gap:2.4rem;align-items:center}
+nav a{color:var(--cream);text-decoration:none;font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;position:relative;padding:.3rem 0;opacity:.85;transition:opacity .3s}
+nav a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold-bright);transition:width .4s cubic-bezier(.7,0,.3,1)}
+nav a:hover{opacity:1}nav a:hover::after{width:100%}
+.btn-reserve{border:1px solid var(--gold);color:var(--gold-bright)!important;padding:.7rem 1.5rem!important;background:linear-gradient(120deg,transparent,rgba(201,162,75,.06));transition:background .4s,color .4s}
+.btn-reserve::after{display:none}
+.btn-reserve:hover{background:var(--gold);color:var(--black)!important}
+.menu-toggle{display:none;flex-direction:column;gap:5px;cursor:none}
+.menu-toggle span{width:26px;height:1.5px;background:var(--gold-bright);transition:.4s}
+
+/* generic buttons */
+.btn{display:inline-block;font-family:var(--sans);font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;padding:1.05rem 2.4rem;text-decoration:none;cursor:none;position:relative;overflow:hidden;transition:color .5s}
+.btn-gold{background:linear-gradient(120deg,var(--gold-deep),var(--gold-bright),var(--gold));color:var(--black);font-weight:400}
+.btn-gold::before{content:"";position:absolute;inset:0;background:var(--cream);transform:translateY(101%);transition:transform .5s cubic-bezier(.7,0,.3,1);z-index:0}
+.btn-gold:hover::before{transform:translateY(0)}
+.btn-gold span{position:relative;z-index:1}
+.btn-outline{border:1px solid var(--gold);color:var(--gold-bright)}
+.btn-outline::before{content:"";position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .5s cubic-bezier(.7,0,.3,1);z-index:0}
+.btn-outline:hover{color:var(--black)}.btn-outline:hover::before{transform:translateY(0)}
+.btn-outline span{position:relative;z-index:1}
+
+/* section scaffolding */
+section{position:relative;padding:9rem 6vw}
+.eyebrow{font-family:var(--sans);font-size:.7rem;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:1rem;justify-content:center;margin-bottom:1.4rem}
+.eyebrow::before,.eyebrow::after{content:"";width:42px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.eyebrow::after{background:linear-gradient(90deg,var(--gold),transparent)}
+.section-title{font-family:var(--display);font-size:clamp(2.4rem,5.5vw,4.4rem);text-align:center;line-height:1.05;letter-spacing:.02em;font-weight:400}
+.section-title em{font-family:var(--serif);font-style:italic;color:var(--gold-bright);font-weight:500}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(48px);transition:opacity 1.1s cubic-bezier(.16,1,.3,1),transform 1.1s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:.12s}.reveal-d2{transition-delay:.24s}.reveal-d3{transition-delay:.36s}.reveal-d4{transition-delay:.48s}
+
+/* word-by-word text reveal */
+.line-mask{display:block;overflow:hidden}
+.line-mask>span{display:inline-block;transform:translateY(110%);transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.in .line-mask>span{transform:translateY(0)}
+.in .line-mask:nth-child(2)>span{transition-delay:.12s}
+.in .line-mask:nth-child(3)>span{transition-delay:.24s}
+
+/* ===== HERO ===== */
+#hero{height:100vh;min-height:680px;padding:0;display:flex;align-items:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{transform:scale(1.15);filter:brightness(.62) saturate(1.05)}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,var(--black) 8%,rgba(10,8,7,.7) 40%,rgba(10,8,7,.15) 70%),linear-gradient(0deg,var(--black),transparent 35%)}
+.hero-inner{position:relative;z-index:2;max-width:1500px;margin:0 auto;width:100%;padding:0 6vw}
+.hero-tag{font-family:var(--serif);font-style:italic;font-size:1.25rem;color:var(--gold-bright);letter-spacing:.06em;margin-bottom:1.4rem}
+.hero-title{font-family:var(--display);font-size:clamp(3rem,9vw,7.5rem);line-height:.95;font-weight:400;letter-spacing:.01em}
+.hero-title .gold{color:var(--gold-bright)}
+.hero-desc{font-size:1.05rem;color:var(--muted);max-width:430px;margin:2rem 0 2.6rem;line-height:1.8;font-weight:300}
+.hero-actions{display:flex;gap:1.2rem;flex-wrap:wrap}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:.8rem;color:var(--muted);font-size:.62rem;letter-spacing:.3em;text-transform:uppercase}
+.hero-scroll .ln{width:1px;height:48px;background:linear-gradient(var(--gold),transparent);position:relative;overflow:hidden}
+.hero-scroll .ln::after{content:"";position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--gold-bright);animation:scrolldown 2s infinite}
+@keyframes scrolldown{0%{top:-50%}100%{top:100%}}
+
+/* ===== ABOUT ===== */
+#about{background:linear-gradient(var(--black),var(--black-2))}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6vw;align-items:center;max-width:1400px;margin:0 auto}
+.about-imgs{position:relative;height:560px}
+.about-imgs .ph{position:absolute;overflow:hidden;border:1px solid var(--line)}
+.about-imgs .ph1{width:62%;height:78%;top:0;left:0;z-index:1}
+.about-imgs .ph2{width:48%;height:55%;bottom:0;right:0;z-index:2;box-shadow:-30px -30px 60px rgba(0,0,0,.6)}
+.about-imgs .ph img{transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+.about-imgs .ph:hover img{transform:scale(1.08)}
+.about-badge{position:absolute;z-index:3;top:42%;left:50%;transform:translate(-50%,-50%);width:130px;height:130px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(10,8,7,.85);backdrop-filter:blur(6px);text-align:center}
+.about-badge .n{font-family:var(--display);font-size:2.2rem;color:var(--gold-bright);line-height:1}
+.about-badge .t{font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-top:.3rem}
+.about-content .eyebrow{justify-content:flex-start}
+.about-content .eyebrow::before{display:none}
+.about-content h2{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;font-weight:400;margin-bottom:1.8rem}
+.about-content h2 em{font-family:var(--serif);font-style:italic;color:var(--gold-bright)}
+.about-content p{color:var(--muted);line-height:1.95;margin-bottom:1.3rem;max-width:520px}
+.about-stats{display:flex;gap:2.5rem;margin-top:2.5rem;padding-top:2.5rem;border-top:1px solid var(--line)}
+.about-stats .s .n{font-family:var(--display);font-size:2.2rem;color:var(--gold-bright)}
+.about-stats .s .l{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.3rem}
+
+/* ===== SIGNATURE ===== */
+#signature{background:var(--black-2)}
+.sig-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6rem;max-width:1450px;margin:4rem auto 0}
+.dish{position:relative;background:var(--panel);border:1px solid var(--line);overflow:hidden;transition:transform .6s cubic-bezier(.16,1,.3,1),box-shadow .6s}
+.dish:hover{transform:translateY(-12px);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.dish-img{height:300px;overflow:hidden;position:relative}
+.dish-img img{transition:transform 1.2s cubic-bezier(.16,1,.3,1);filter:brightness(.92)}
+.dish:hover .dish-img img{transform:scale(1.12);filter:brightness(1)}
+.dish-img::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(10,8,7,.65))}
+.dish-body{padding:1.6rem 1.5rem 1.8rem}
+.dish-body h3{font-family:var(--serif);font-size:1.5rem;font-weight:600;margin-bottom:.4rem}
+.dish-body .d{font-size:.78rem;color:var(--muted);line-height:1.6;letter-spacing:.02em;min-height:2.6em}
+.dish-price{margin-top:1rem;font-family:var(--display);font-size:1.3rem;color:var(--gold-bright);display:flex;align-items:center;gap:.6rem}
+.dish-price::before{content:"";flex:0 0 28px;height:1px;background:var(--gold)}
+
+/* ===== MENU ===== */
+#menu{background:linear-gradient(var(--black-2),var(--black))}
+.menu-cats{display:flex;justify-content:center;gap:2.5rem;margin:3rem 0;flex-wrap:wrap}
+.menu-cat{font-family:var(--sans);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:none;padding:.6rem .2rem;position:relative;transition:color .4s}
+.menu-cat::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold-bright);transition:width .4s}
+.menu-cat.active,.menu-cat:hover{color:var(--gold-bright)}
+.menu-cat.active::after{width:100%}
+.menu-list{max-width:1000px;margin:0 auto;display:none;grid-template-columns:1fr 1fr;gap:0 5rem}
+.menu-list.show{display:grid}
+.menu-item{display:flex;align-items:flex-end;gap:1rem;padding:1.5rem 0;border-bottom:1px solid rgba(201,162,75,.12);transition:padding-left .4s}
+.menu-item:hover{padding-left:1rem}
+.menu-item .info{flex:1}
+.menu-item .info h4{font-family:var(--serif);font-size:1.4rem;font-weight:600;display:flex;align-items:center;gap:.7rem;transition:color .4s}
+.menu-item:hover .info h4{color:var(--gold-bright)}
+.menu-item .info p{font-size:.76rem;color:var(--muted);margin-top:.3rem;letter-spacing:.02em}
+.menu-item .dots{flex:1;border-bottom:1px dotted rgba(201,162,75,.35);margin:0 .4rem 6px}
+.menu-item .price{font-family:var(--display);font-size:1.25rem;color:var(--gold-bright);white-space:nowrap}
+.tag-veg{font-size:.5rem;border:1px solid var(--gold);color:var(--gold);padding:.15rem .35rem;letter-spacing:.1em;border-radius:2px;text-transform:uppercase}
+
+/* ===== CHEF ===== */
+#chef{background:var(--black);overflow:hidden}
+.chef-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:6vw;align-items:center;max-width:1400px;margin:0 auto}
+.chef-img{position:relative;height:640px;overflow:hidden;border:1px solid var(--line)}
+.chef-img img{filter:brightness(.85) saturate(1.05);transition:transform 1.6s cubic-bezier(.16,1,.3,1)}
+.chef-img:hover img{transform:scale(1.06)}
+.chef-img::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,8,7,.7),transparent 50%)}
+.chef-img .cap{position:absolute;bottom:2rem;left:2rem;z-index:2}
+.chef-img .cap .nm{font-family:var(--display);font-size:1.8rem;color:var(--cream)}
+.chef-img .cap .rl{font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-bright);margin-top:.3rem}
+.chef-content .eyebrow{justify-content:flex-start}.chef-content .eyebrow::before{display:none}
+.chef-content h2{font-family:var(--display);font-size:clamp(2.2rem,4.5vw,3.6rem);line-height:1.08;font-weight:400;margin-bottom:1.6rem}
+.chef-content h2 em{font-family:var(--serif);font-style:italic;color:var(--gold-bright)}
+.chef-content blockquote{font-family:var(--serif);font-style:italic;font-size:1.5rem;line-height:1.6;color:var(--cream);border-left:2px solid var(--gold);padding-left:1.6rem;margin:0 0 2rem}
+.chef-content p{color:var(--muted);line-height:1.95;margin-bottom:1.3rem;max-width:560px}
+.chef-sign{font-family:var(--serif);font-style:italic;font-size:2.2rem;color:var(--gold-bright);margin-top:1.5rem}
+
+/* ===== GALLERY ===== */
+#gallery{background:linear-gradient(var(--black),var(--black-2))}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:1rem;max-width:1500px;margin:4rem auto 0}
+.gal-item{overflow:hidden;position:relative;border:1px solid var(--line)}
+.gal-item img{transition:transform 1.3s cubic-bezier(.16,1,.3,1);filter:brightness(.85) saturate(1.05)}
+.gal-item::after{content:"";position:absolute;inset:0;background:rgba(10,8,7,.35);opacity:0;transition:opacity .5s}
+.gal-item:hover img{transform:scale(1.12)}
+.gal-item:hover::after{opacity:0}
+.gal-item .plus{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;transition:opacity .5s}
+.gal-item .plus span{width:48px;height:48px;border:1px solid var(--gold-bright);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold-bright);font-size:1.5rem;font-family:var(--serif);background:rgba(10,8,7,.5);backdrop-filter:blur(4px)}
+.gal-item:hover .plus{opacity:1}
+.g-tall{grid-row:span 2}.g-wide{grid-column:span 2}
+
+/* ===== RESERVATIONS ===== */
+#reserve{position:relative;overflow:hidden}
+.reserve-bg{position:absolute;inset:0;z-index:0}
+.reserve-bg img{filter:brightness(.3) saturate(.9)}
+.reserve-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(var(--black),rgba(10,8,7,.7),var(--black))}
+.reserve-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;text-align:center}
+.reserve-form{margin-top:3rem;background:rgba(16,13,10,.7);backdrop-filter:blur(12px);border:1px solid var(--line);padding:3rem 2.8rem;display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;text-align:left}
+.field{position:relative}
+.field label{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+.field input,.field select{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--cream);font-family:var(--sans);font-size:.95rem;padding:.6rem 0;outline:none;transition:border-color .4s;cursor:none}
+.field input::placeholder{color:rgba(182,169,143,.4)}
+.field input:focus,.field select:focus{border-color:var(--gold-bright)}
+.field select option{background:var(--panel);color:var(--cream)}
+.field.full{grid-column:1/-1}
+.reserve-form .btn{grid-column:1/-1;justify-self:center;margin-top:1rem;width:auto}
+
+/* ===== TESTIMONIALS ===== */
+#testi{background:var(--black-2)}
+.testi-wrap{max-width:1300px;margin:4rem auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem}
+.testi{background:linear-gradient(160deg,var(--panel),var(--panel-2));border:1px solid var(--line);padding:2.6rem 2.2rem;position:relative;transition:transform .6s,border-color .6s}
+.testi:hover{transform:translateY(-8px);border-color:var(--gold)}
+.testi .quote{font-family:var(--serif);font-size:5rem;color:var(--gold-deep);line-height:.6;opacity:.4;position:absolute;top:1.4rem;right:1.6rem}
+.testi .stars{color:var(--gold-bright);letter-spacing:.2em;margin-bottom:1.2rem}
+.testi p{font-family:var(--serif);font-size:1.22rem;font-style:italic;line-height:1.7;color:var(--cream);margin-bottom:1.8rem}
+.testi .who{display:flex;align-items:center;gap:1rem;padding-top:1.3rem;border-top:1px solid var(--line)}
+.testi .who .av{width:46px;height:46px;border-radius:50%;overflow:hidden;border:1px solid var(--gold);flex:0 0 46px}
+.testi .who .nm{font-family:var(--display);font-size:1.05rem}
+.testi .who .ti{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+
+/* ===== CONTACT / FOOTER ===== */
+#contact{background:linear-gradient(var(--black-2),var(--black))}
+.contact-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:6vw;max-width:1400px;margin:0 auto;align-items:center}
+.contact-info h2{font-family:var(--display);font-size:clamp(2rem,4vw,3rem);font-weight:400;line-height:1.1;margin-bottom:2rem}
+.contact-info h2 em{font-family:var(--serif);font-style:italic;color:var(--gold-bright)}
+.contact-row{display:flex;gap:1.4rem;padding:1.4rem 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.contact-row .ic{flex:0 0 38px;height:38px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold-bright);font-size:1rem}
+.contact-row .lbl{font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
+.contact-row .val{font-family:var(--serif);font-size:1.25rem;color:var(--cream);line-height:1.4}
+.contact-map{height:440px;border:1px solid var(--line);overflow:hidden;position:relative}
+.contact-map img{filter:grayscale(.3) brightness(.7) sepia(.3)}
+footer{background:var(--black);border-top:1px solid var(--line);padding:3.5rem 6vw 2.5rem;text-align:center}
+.foot-brand{font-family:var(--display);font-size:1.8rem;letter-spacing:.3em;text-indent:.3em;color:var(--cream)}
+.foot-brand span{display:block;font-size:.6rem;letter-spacing:.5em;text-indent:.5em;color:var(--gold);margin-top:.4rem}
+.foot-soc{display:flex;justify-content:center;gap:1.5rem;margin:2rem 0}
+.foot-soc a{width:40px;height:40px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;font-size:.7rem;letter-spacing:.1em;transition:.4s;cursor:none}
+.foot-soc a:hover{border-color:var(--gold);color:var(--gold-bright);transform:translateY(-4px)}
+.foot-line{font-size:.7rem;letter-spacing:.12em;color:var(--muted);margin-top:1.5rem}
+.foot-line .gold{color:var(--gold)}
+
+/* responsive */
+@media(max-width:980px){
+  nav{position:fixed;top:0;right:0;height:100vh;width:min(78vw,360px);background:rgba(10,8,7,.97);backdrop-filter:blur(20px);flex-direction:column;justify-content:center;gap:2.4rem;transform:translateX(100%);transition:transform .6s cubic-bezier(.7,0,.3,1);border-left:1px solid var(--line);z-index:850}
+  nav.open{transform:translateX(0)}
+  nav a{font-size:1rem}
+  .menu-toggle{display:flex;z-index:950}
+  .menu-toggle.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .menu-toggle.open span:nth-child(2){opacity:0}
+  .menu-toggle.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .about-grid,.chef-grid,.contact-grid{grid-template-columns:1fr;gap:3rem}
+  .about-imgs{height:440px}
+  .chef-img{height:520px;order:-1}
+  .sig-grid{grid-template-columns:repeat(2,1fr)}
+  .menu-list.show{grid-template-columns:1fr;gap:0}
+  .gal-grid{grid-template-columns:repeat(2,1fr)}
+  .testi-wrap{grid-template-columns:1fr}
+  .reserve-form{grid-template-columns:1fr}
+  .g-wide{grid-column:span 1}
+}
+@media(max-width:560px){
+  section{padding:6rem 7vw}
+  .sig-grid{grid-template-columns:1fr}
+  .hero-actions{flex-direction:column}.hero-actions .btn{text-align:center}
+  .about-stats{flex-wrap:wrap;gap:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- cursor -->
+<div class="cursor"></div><div class="cursor-dot"></div>
+
+<!-- preloader -->
+<div id="loader">
+  <div class="loader-mark">ROYAL SPICE</div>
+  <div class="loader-sub">Crafting an elevated experience…</div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- nav -->
+<header id="header">
+  <div class="brand">ROYAL SPICE<span>FINE DINING</span></div>
+  <nav id="nav">
+    <a href="#about">About</a>
+    <a href="#signature">Signature</a>
+    <a href="#menu">Menu</a>
+    <a href="#chef">Chef</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#testi">Reviews</a>
+    <a href="#contact">Contact</a>
+    <a href="#reserve" class="btn-reserve">Reserve Table</a>
+  </nav>
+  <div class="menu-toggle" id="toggle"><span></span><span></span><span></span></div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg" data-parallax="0.25">
+    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1600&auto=format&fit=crop" alt="Plated fine dining dish" referrerpolicy="no-referrer">
+  </div>
+  <div class="hero-inner reveal">
+    <div class="hero-tag">Est. 2009 · A Michelin Tradition</div>
+    <h1 class="hero-title">An Elevated<br>Dining <span class="gold">Experience</span></h1>
+    <p class="hero-desc">Where the warmth of royal spice meets uncompromising culinary craftsmanship. A journey through flavour, served beneath candlelight and gold.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn btn-gold"><span>Explore Menu</span></a>
+      <a href="#reserve" class="btn btn-outline"><span>Book Your Table</span></a>
+    </div>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><span class="ln"></span></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-imgs reveal">
+      <div class="ph ph1"><img src="https://images.unsplash.com/photo-1592861956120-e524fc739696?q=80&w=900&auto=format&fit=crop" alt="Restaurant interior" referrerpolicy="no-referrer"></div>
+      <div class="ph ph2"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=900&auto=format&fit=crop" alt="Elegant dining table" referrerpolicy="no-referrer"></div>
+      <div class="about-badge"><div class="n">16</div><div class="t">Years of<br>Excellence</div></div>
+    </div>
+    <div class="about-content reveal reveal-d1">
+      <div class="eyebrow">Our Story</div>
+      <h2>A Sanctuary of <em>Taste</em> &amp; Refinement</h2>
+      <p>Royal Spice was born from a singular obsession: to transform dining into theatre. Every dish is composed like a sonata — layered, intentional, unforgettable — drawing from heritage spice routes and modern gastronomy alike.</p>
+      <p>Set within a restored heritage hall of warm brass and obsidian marble, our room is designed to make every guest feel like royalty. The lighting is low, the service is silent, and the flavours are loud.</p>
+      <div class="about-stats">
+        <div class="s"><div class="n">2★</div><div class="l">Michelin Stars</div></div>
+        <div class="s"><div class="n">48</div><div class="l">Seats Only</div></div>
+        <div class="s"><div class="n">9</div><div class="l">Course Tasting</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNATURE -->
+<section id="signature">
+  <div class="reveal">
+    <div class="eyebrow">Chef's Selection</div>
+    <h2 class="section-title">Signature <em>Dishes</em></h2>
+  </div>
+  <div class="sig-grid">
+    <article class="dish reveal">
+      <div class="dish-img"><img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?q=80&w=700&auto=format&fit=crop" alt="Wagyu" referrerpolicy="no-referrer"></div>
+      <div class="dish-body"><h3>Royal Wagyu</h3><p class="d">A5 wagyu, smoked bone marrow, charred shallot &amp; black truffle jus.</p><div class="dish-price">₹4,800</div></div>
+    </article>
+    <article class="dish reveal reveal-d1">
+      <div class="dish-img"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=700&auto=format&fit=crop" alt="Lobster" referrerpolicy="no-referrer"></div>
+      <div class="dish-body"><h3>Saffron Lobster</h3><p class="d">Butter-poached lobster, saffron velouté, sea herbs &amp; gold leaf.</p><div class="dish-price">₹3,900</div></div>
+    </article>
+    <article class="dish reveal reveal-d2">
+      <div class="dish-img"><img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=700&auto=format&fit=crop" alt="Scallops" referrerpolicy="no-referrer"></div>
+      <div class="dish-body"><h3>Seared Scallops</h3><p class="d">Hand-dived scallops, spiced cauliflower purée &amp; brown butter.</p><div class="dish-price">₹2,600</div></div>
+    </article>
+    <article class="dish reveal reveal-d3">
+      <div class="dish-img"><img src="https://images.unsplash.com/photo-1476124369491-e7addf5db371?q=80&w=700&auto=format&fit=crop" alt="Risotto" referrerpolicy="no-referrer"></div>
+      <div class="dish-body"><h3>Truffle Risotto</h3><p class="d">Aged carnaroli, wild mushroom, parmesan crisp &amp; black truffle.</p><div class="dish-price">₹2,200</div></div>
+    </article>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="reveal">
+    <div class="eyebrow">À La Carte</div>
+    <h2 class="section-title">Curated <em>Menu</em></h2>
+  </div>
+  <div class="menu-cats reveal reveal-d1">
+    <button class="menu-cat active" data-cat="starters">Starters</button>
+    <button class="menu-cat" data-cat="mains">Main Course</button>
+    <button class="menu-cat" data-cat="desserts">Desserts</button>
+    <button class="menu-cat" data-cat="wines">Wines</button>
+  </div>
+
+  <div class="menu-list show reveal reveal-d2" data-list="starters">
+    <div class="menu-item"><div class="info"><h4>Spiced Tuna Tartare <span class="tag-veg" style="border-color:#c0392b;color:#e07b6c">N</span></h4><p>Yellowfin tuna, avocado, citrus &amp; toasted sesame</p></div><div class="dots"></div><div class="price">₹1,200</div></div>
+    <div class="menu-item"><div class="info"><h4>Burrata &amp; Heirloom <span class="tag-veg">Veg</span></h4><p>Creamy burrata, heirloom tomato, basil oil</p></div><div class="dots"></div><div class="price">₹980</div></div>
+    <div class="menu-item"><div class="info"><h4>Foie Gras Royale</h4><p>Seared foie gras, fig compote, brioche</p></div><div class="dots"></div><div class="price">₹1,850</div></div>
+    <div class="menu-item"><div class="info"><h4>Saffron Soup <span class="tag-veg">Veg</span></h4><p>Velvet pumpkin, saffron cream, spiced oil</p></div><div class="dots"></div><div class="price">₹750</div></div>
+  </div>
+
+  <div class="menu-list reveal reveal-d2" data-list="mains">
+    <div class="menu-item"><div class="info"><h4>Royal Wagyu</h4><p>A5 wagyu, bone marrow, black truffle jus</p></div><div class="dots"></div><div class="price">₹4,800</div></div>
+    <div class="menu-item"><div class="info"><h4>Saffron Lobster</h4><p>Butter-poached lobster, saffron velouté</p></div><div class="dots"></div><div class="price">₹3,900</div></div>
+    <div class="menu-item"><div class="info"><h4>Lamb Rogan Royale</h4><p>Slow-braised lamb, heritage spice, saffron rice</p></div><div class="dots"></div><div class="price">₹2,400</div></div>
+    <div class="menu-item"><div class="info"><h4>Paneer Makhani Gold <span class="tag-veg">Veg</span></h4><p>House paneer, velvet tomato, gold leaf</p></div><div class="dots"></div><div class="price">₹1,600</div></div>
+  </div>
+
+  <div class="menu-list reveal reveal-d2" data-list="desserts">
+    <div class="menu-item"><div class="info"><h4>Gold Leaf Soufflé</h4><p>Dark chocolate soufflé, salted caramel, 24k gold</p></div><div class="dots"></div><div class="price">₹890</div></div>
+    <div class="menu-item"><div class="info"><h4>Saffron Kulfi</h4><p>Cardamom kulfi, pistachio crumble, rose</p></div><div class="dots"></div><div class="price">₹650</div></div>
+    <div class="menu-item"><div class="info"><h4>Crème Brûlée Royale</h4><p>Vanilla bean custard, caramelised sugar</p></div><div class="dots"></div><div class="price">₹720</div></div>
+    <div class="menu-item"><div class="info"><h4>Mango Mousse Tart</h4><p>Alphonso mango, white chocolate, almond</p></div><div class="dots"></div><div class="price">₹680</div></div>
+  </div>
+
+  <div class="menu-list reveal reveal-d2" data-list="wines">
+    <div class="menu-item"><div class="info"><h4>Dom Pérignon 2013</h4><p>Vintage champagne, by the bottle</p></div><div class="dots"></div><div class="price">₹38,000</div></div>
+    <div class="menu-item"><div class="info"><h4>Château Margaux</h4><p>Bordeaux blend, by the glass</p></div><div class="dots"></div><div class="price">₹6,500</div></div>
+    <div class="menu-item"><div class="info"><h4>Sula Rasa Reserve</h4><p>Indian Cabernet Sauvignon, by the bottle</p></div><div class="dots"></div><div class="price">₹4,200</div></div>
+    <div class="menu-item"><div class="info"><h4>Sommelier's Pairing</h4><p>Five-glass flight curated nightly</p></div><div class="dots"></div><div class="price">₹5,800</div></div>
+  </div>
+</section>
+
+<!-- CHEF -->
+<section id="chef">
+  <div class="chef-grid">
+    <div class="chef-img reveal">
+      <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=900&auto=format&fit=crop" alt="Chef portrait" referrerpolicy="no-referrer">
+      <div class="cap"><div class="nm">Chef Arjun Mehra</div><div class="rl">Executive Head Chef</div></div>
+    </div>
+    <div class="chef-content reveal reveal-d1">
+      <div class="eyebrow">The Artisan</div>
+      <h2>The Mind Behind <em>The Magic</em></h2>
+      <blockquote>"A plate should tell a story the moment it touches the table."</blockquote>
+      <p>Trained across Paris, Tokyo and the royal kitchens of Rajasthan, Chef Arjun fuses classical European technique with the soul of Indian spice. His tasting menu changes with the seasons, sourced from the finest local farms and rare global imports.</p>
+      <p>Twice awarded Michelin stars, his philosophy is simple — restraint, precision, and an unrelenting pursuit of the perfect bite.</p>
+      <div class="chef-sign">Arjun Mehra</div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="reveal">
+    <div class="eyebrow">Moments</div>
+    <h2 class="section-title">The <em>Gallery</em></h2>
+  </div>
+  <div class="gal-grid reveal reveal-d1">
+    <div class="gal-item g-tall"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?q=80&w=600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1514516345957-556ca7d90a29?q=80&w=600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item g-wide"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=900&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092?q=80&w=600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item g-wide"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=900&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"><div class="plus"><span>+</span></div></div>
+  </div>
+</section>
+
+<!-- RESERVATIONS -->
+<section id="reserve">
+  <div class="reserve-bg" data-parallax="0.18"><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1600&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"></div>
+  <div class="reserve-inner reveal">
+    <div class="eyebrow">Reservations</div>
+    <h2 class="section-title">Reserve Your <em>Table</em></h2>
+    <p style="color:var(--muted);margin-top:1.2rem;line-height:1.8">An evening at Royal Spice is by reservation only. Secure your place at the table.</p>
+    <div class="reserve-form">
+      <div class="field"><label>Full Name</label><input type="text" placeholder="Your name"></div>
+      <div class="field"><label>Phone</label><input type="tel" placeholder="+91 00000 00000"></div>
+      <div class="field"><label>Date</label><input type="date"></div>
+      <div class="field"><label>Time</label>
+        <select><option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option><option>8:30 PM</option><option>9:00 PM</option></select>
+      </div>
+      <div class="field"><label>Guests</label>
+        <select><option>2 Guests</option><option>3 Guests</option><option>4 Guests</option><option>6 Guests</option><option>8+ Guests</option></select>
+      </div>
+      <div class="field"><label>Occasion</label><input type="text" placeholder="Anniversary, birthday…"></div>
+      <a href="#" class="btn btn-gold" onclick="reserveSubmit(event)"><span>Confirm Reservation</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testi">
+  <div class="reveal">
+    <div class="eyebrow">Guest Voices</div>
+    <h2 class="section-title">What They <em>Say</em></h2>
+  </div>
+  <div class="testi-wrap">
+    <div class="testi reveal"><div class="quote">”</div><div class="stars">★★★★★</div><p>An unforgettable evening. Every course felt like a small revelation. The wagyu alone is worth the journey.</p><div class="who"><div class="av"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"></div><div><div class="nm">Priya Nair</div><div class="ti">Food Critic, Vogue India</div></div></div></div>
+    <div class="testi reveal reveal-d1"><div class="quote">”</div><div class="stars">★★★★★</div><p>The atmosphere is pure cinema — gold, candlelight and flawless service. This is fine dining at its absolute peak.</p><div class="who"><div class="av"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"></div><div><div class="nm">Rohan Kapoor</div><div class="ti">Hotelier</div></div></div></div>
+    <div class="testi reveal reveal-d2"><div class="quote">”</div><div class="stars">★★★★★</div><p>Chef Arjun is a true artist. We came for an anniversary and left with a memory we'll keep for a lifetime.</p><div class="who"><div class="av"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop" alt="" referrerpolicy="no-referrer"></div><div><div class="nm">Ananya Desai</div><div class="ti">Regular Guest</div></div></div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <div class="eyebrow" style="justify-content:flex-start">Visit Us</div>
+      <h2>Find Your Way <em>To Us</em></h2>
+      <div class="contact-row"><div class="ic">✦</div><div><div class="lbl">Address</div><div class="val">14 Heritage Lane, Civil Lines<br>Udgir, Maharashtra 413517</div></div></div>
+      <div class="contact-row"><div class="ic">☎</div><div><div class="lbl">Reservations</div><div class="val">+91 98765 43210</div></div></div>
+      <div class="contact-row"><div class="ic">✉</div><div><div class="lbl">Email</div><div class="val">dine@royalspice.in</div></div></div>
+      <div class="contact-row" style="border-bottom:none"><div class="ic">◷</div><div><div class="lbl">Hours</div><div class="val">Tue – Sun · 6:00 PM – 11:30 PM<br><span style="font-size:.85rem;color:var(--muted)">Closed Mondays</span></div></div></div>
+    </div>
+    <div class="contact-map reveal reveal-d1"><img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=900&auto=format&fit=crop" alt="Map location" referrerpolicy="no-referrer"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-brand">ROYAL SPICE<span>FINE DINING</span></div>
+  <div class="foot-soc">
+    <a href="#">IG</a><a href="#">FB</a><a href="#">X</a><a href="#">in</a>
+  </div>
+  <div class="foot-line">© 2026 Royal Spice. Crafted with <span class="gold">passion</span> &amp; precision. All rights reserved.</div>
+</footer>
+
+<script>
+/* ---------- preloader ---------- */
+window.addEventListener('load',()=>{
+  setTimeout(()=>document.getElementById('loader').classList.add('done'),1700);
+});
+
+/* ---------- custom cursor ---------- */
+const cur=document.querySelector('.cursor'),dot=document.querySelector('.cursor-dot');
+let mx=0,my=0,cx=0,cy=0;
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function loop(){cx+=(mx-cx)*.18;cy+=(my-cy)*.18;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.dish,.gal-item,.menu-item,input,select,.testi').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('grow'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('grow'));
+});
+
+/* ---------- header scroll ---------- */
+const header=document.getElementById('header');
+window.addEventListener('scroll',()=>{
+  header.classList.toggle('scrolled',window.scrollY>60);
+});
+
+/* ---------- mobile nav ---------- */
+const toggle=document.getElementById('toggle'),nav=document.getElementById('nav');
+toggle.addEventListener('click',()=>{toggle.classList.toggle('open');nav.classList.toggle('open');});
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{toggle.classList.remove('open');nav.classList.remove('open');}));
+
+/* ---------- scroll reveal ---------- */
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- parallax (cinematic) ---------- */
+const px=document.querySelectorAll('[data-parallax]');
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  px.forEach(el=>{
+    const r=el.getBoundingClientRect();
+    const speed=parseFloat(el.dataset.parallax);
+    const off=(window.innerHeight-r.top)*speed;
+    if(r.bottom>0&&r.top<window.innerHeight){
+      el.querySelector('img').style.transform=`scale(1.18) translateY(${off*0.4}px)`;
+    }
+  });
+});
+
+/* ---------- menu tabs ---------- */
+const cats=document.querySelectorAll('.menu-cat');
+cats.forEach(c=>c.addEventListener('click',()=>{
+  cats.forEach(x=>x.classList.remove('active'));c.classList.add('active');
+  document.querySelectorAll('.menu-list').forEach(l=>l.classList.remove('show'));
+  const list=document.querySelector(`[data-list="${c.dataset.cat}"]`);
+  list.classList.add('show');
+  list.querySelectorAll('.menu-item').forEach((it,i)=>{
+    it.style.opacity=0;it.style.transform='translateY(20px)';
+    setTimeout(()=>{it.style.transition='.6s';it.style.opacity=1;it.style.transform='none';},i*70);
+  });
+}));
+
+/* ---------- reservation ---------- */
+function reserveSubmit(e){
+  e.preventDefault();
+  const btn=e.currentTarget.querySelector('span');
+  btn.textContent='Reservation Requested ✦';
+  e.currentTarget.style.pointerEvents='none';
+  setTimeout(()=>{btn.textContent='Confirm Reservation';e.currentTarget.style.pointerEvents='auto';},3000);
+}
+</script>
+</body>
+</html>
